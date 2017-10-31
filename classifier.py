@@ -54,7 +54,8 @@ class Classifier(object):
     def train_on_batch(self, x, y):
         num_pop = 10
         lr = 0.01
-        mutations = np.random.normal(-lr, lr, (num_pop,) + self.W.shape)  # num_pop, input_dim, num_classes
+        mutations = [np.random.normal(-lr, lr, self.W.shape) for _ in range(num_pop)]  # num_pop, input_dim, num_classes
+        #mutations.append(self.previous_update)
         rewards = np.zeros(num_pop)
         for i, m in enumerate(mutations):
             W = m + self.W
@@ -70,7 +71,7 @@ class Classifier(object):
         else:
             rewards /= std
         update = np.tensordot(rewards, mutations, (0, 0))
-        update = update + 0.1 * self.previous_update
+        #update = update + 0.1 * self.previous_update
         self.previous_update = update
         self.W += update
 
