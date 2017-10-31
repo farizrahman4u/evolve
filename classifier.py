@@ -9,7 +9,7 @@ class Classifier(object):
         self.build()
 
     def build(self):
-        self.W = np.random.uniform(-1, 1, (self.input_dim, self.num_classes))
+        self.W = np.random.uniform(-.1, .1, (self.input_dim, self.num_classes))
         self.previous_update = np.zeros_like(self.W)
 
     def predict(self, x):
