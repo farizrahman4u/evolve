@@ -130,7 +130,7 @@ def get_file(fname,
     By default the file at the url `origin` is downloaded to the
     cache_dir `~/.evlutionary-learning`, placed in the cache_subdir `datasets`,
     and given the filename `fname`. The final location of a file
-    `example.txt` would therefore be `~/.evolutionary-learning/datasets/example.txt`.
+    `example.txt` would therefore be `~/.evolve/datasets/example.txt`.
 
     Files in tar, tar.gz, tar.bz, and zip formats can also be extracted.
     Passing a hash will verify the file after download. The command line
@@ -146,7 +146,7 @@ def get_file(fname,
             md5 hash of the file for verification
         file_hash: The expected hash string of the file after download.
             The sha256 and md5 hash algorithms are both supported.
-        cache_subdir: Subdirectory under the evolutionary-learning cache dir where the file is
+        cache_subdir: Subdirectory under the evolve cache dir where the file is
             saved. If an absolute path `/path/to/folder` is
             specified the file will be saved at that location.
         hash_algorithm: Select the hash algorithm to verify the file.
@@ -159,19 +159,19 @@ def get_file(fname,
             The default 'auto' is ['tar', 'zip'].
             None or an empty list will return no matches found.
         cache_dir: Location to store cached files, when None it
-            defaults to the evolutionary-learning Directory
+            defaults to the evolve Directory
 
     # Returns
         Path to the downloaded file
     """
     if cache_dir is None:
-        cache_dir = os.path.expanduser(os.path.join('~', '.evolutionary-learning'))
+        cache_dir = os.path.expanduser(os.path.join('~', '.evolve'))
     if md5_hash is not None and file_hash is None:
         file_hash = md5_hash
         hash_algorithm = 'md5'
     datadir_base = os.path.expanduser(cache_dir)
     if not os.access(datadir_base, os.W_OK):
-        datadir_base = os.path.join('/tmp', '.evolutionary-learning')
+        datadir_base = os.path.join('/tmp', '.evolve')
     datadir = os.path.join(datadir_base, cache_subdir)
     if not os.path.exists(datadir):
         os.makedirs(datadir)
