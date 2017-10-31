@@ -64,7 +64,7 @@ class Classifier(object):
                 idx += batch_size
             if validation_data:
                 print('')
-                print('Accuracy :' + str(self.evaluate(*validation_data)) + '%')
+                print('Accuracy :' + str(self.evaluate(*validation_data) * 100) + '%')
 
     def evaluate(self, x, y):
         y_pred = self.predict(x)
