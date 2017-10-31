@@ -90,6 +90,8 @@ class Classifier(object):
             rewards = np.zeros_like(rewards)
         else:
             rewards /= std
+        #rewards *= rewards < 0
+        '''
         update = np.zeros_like(self.W)
         max_idx = np.argmax(rewards)
         max_reward = rewards[max_idx]
@@ -98,9 +100,9 @@ class Classifier(object):
         min_idx = np.argmin(rewards)
         min_reward = rewards[min_idx]
         if min_reward < 0:
-            update -= mutations[min_idx] * np.abs(min_reward)
-        
-        #update = np.tensordot(rewards, mutations, (0, 0))
+            pass#update -= mutations[min_idx] * np.abs(min_reward)
+        '''
+        update = np.tensordot(rewards, mutations, (0, 0))
         #update = update + 0.1 * self.previous_update
         #self.previous_update = update
         self.W += update
