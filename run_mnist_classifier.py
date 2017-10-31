@@ -5,7 +5,7 @@ import numpy as np
 
 
 batch_size = 16
-epochs = 10
+epochs = 15
 
 # the data, shuffled and split between train and test sets
 (x_train, y_train), (x_test, y_test) = load_data()
