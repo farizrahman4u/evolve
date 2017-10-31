@@ -10,6 +10,7 @@ class Classifier(object):
 
     def build(self):
         self.W = np.random.uniform(-1, 1, (self.input_dim, self.num_classes))
+        self.previous_update = np.zeros_like(self.W)
 
     def predict(self, x):
         h = np.dot(x, self.W)
@@ -25,7 +26,8 @@ class Classifier(object):
         labels = np.argmax(y_true, axis=-1)
         return np.diag(y_pred.T[labels])
 
-    def train_on_batch(self, x, y):
+
+    def _train_on_batch(self, x, y):
         num_pop = 10
         lr = 0.01
         mutations = np.random.normal(-0.1, 0.1, (num_pop,) + self.W.shape)  # num_pop, input_dim, num_classes
@@ -48,6 +50,29 @@ class Classifier(object):
             rewards /= std
         update = np.tensordot(rewards, mutations, (0, 0))
         self.W += lr * update
+
+    def train_on_batch(self, x, y):
+        num_pop = 10
+        lr = 0.01
+        mutations = np.random.normal(-lr, lr, (num_pop,) + self.W.shape)  # num_pop, input_dim, num_classes
+        rewards = np.zeros(num_pop)
+        for i, m in enumerate(mutations):
+            W = m + self.W
+            h = np.dot(x, W)
+            y_hat = np.exp(h - np.max(h, axis=1, keepdims=True))
+            s = np.sum(y_hat, axis=1, keepdims=True)
+            y_hat /= s
+            rewards[i] = self.reward(y_hat, y).mean()
+        rewards -= np.mean(rewards)
+        std = np.std(rewards)
+        if std == 0:
+            rewards = np.zeros_like(rewards)
+        else:
+            rewards /= std
+        update = np.tensordot(rewards, mutations, (0, 0))
+        update = update + 0.1 * self.previous_update
+        self.previous_update = update
+        self.W += update
 
     def fit(self, x, y, batch_size=32, epochs=10, validation_data=None):
         num_samples = len(x)
