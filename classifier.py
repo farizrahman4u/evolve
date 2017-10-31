@@ -3,38 +3,26 @@ from progressbar import ProgressBar
 
 class Classifier(object):
 
-    def __init__(self, input_dim, num_classes, hidden_dim=None):
+    def __init__(self, input_dim, num_classes, use_bias=False):
         self.input_dim = input_dim
         self.num_classes = num_classes
-        self.hidden_dim = hidden_dim
+        self.use_bias = use_bias
         self.build()
 
     def build(self):
-        if self.hidden_dim:
-            self.W = np.zeros((self.input_dim + self.num_classes, self.hidden_dim))
-        else:
-            self.W = np.zeros((self.input_dim, self.num_classes))
-            self.predict = self._predict
+        self.W = np.zeros((self.input_dim + int(self.use_bias), self.num_classes))
         #self.W = np.random.uniform(-.1, .1, (self.input_dim, self.num_classes))
         self.previous_update = np.zeros_like(self.W)
-
-    def _predict(self, x, w=None):
-        if w is None:
-            w = self.W
-        h = np.dot(x, w)
-        y = np.exp(h - np.max(h, axis=1, keepdims=True))
-        s = np.sum(y, axis=1, keepdims=True)
-        y /= s
-        return y
 
     def predict(self, x, w=None):
         if w is None:
             w = self.W
-        w1 = w[:self.input_dim, :]
-        w2 = w[self.input_dim:, :].T
-        h = np.dot(x, w1)
-        h = 1. / (1. + np.exp(-h))
-        y = np.dot(h, w2)
+        if self.use_bias:
+            b = w[-1]
+            w = w[:-1]
+            h = np.dot(x, w) + b
+        else:
+            h = np.dot(x, w)
         y = np.exp(h - np.max(h, axis=1, keepdims=True))
         s = np.sum(y, axis=1, keepdims=True)
         y /= s
@@ -46,31 +34,6 @@ class Classifier(object):
     def reward(self, y_pred, y_true):
         labels = np.argmax(y_true, axis=-1)
         return np.diag(y_pred.T[labels])
-
-
-    def _train_on_batch(self, x, y):
-        num_pop = 10
-        lr = 0.01
-        mutations = np.random.normal(-0.1, 0.1, (num_pop,) + self.W.shape)  # num_pop, input_dim, num_classes
-        W = mutations + self.W  # num_pop, input_dim, num_classes
-        h = np.tensordot(x, W, (1, 1))  # batch_size, num_pop, num_classes
-        h = np.transpose(h, (1, 0, 2))  # num_pop, batch_size, num_classes
-        h = np.reshape(h, (-1, self.num_classes))  # num_pop * batch_size, num_classes
-        y_hat = np.exp(h - np.max(h, axis=1, keepdims=True))  # num_pop * batch_size, num_classes
-        s = np.sum(y_hat, axis=1, keepdims=True)  # num_pop * batch_size, 1
-        y_hat /= s  # num_pop * batch_size, num_classes
-        y = np.tile(y, (num_pop, 1)) # num_pop * batch_size, num_classes
-        rewards = self.reward(y_hat, y)  # num_pop * batch_size
-        rewards = np.reshape(rewards, (num_pop, -1))
-        rewards = np.mean(rewards, axis=1)  # num_pop
-        rewards -= np.mean(rewards)
-        std = np.std(rewards)
-        if std == 0:
-            rewards = np.zeros_like(rewards)
-        else:
-            rewards /= std
-        update = np.tensordot(rewards, mutations, (0, 0))
-        self.W += lr * update
 
     def train_on_batch(self, x, y):
         num_pop = 5
