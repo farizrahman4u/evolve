@@ -75,7 +75,7 @@ class Classifier(object):
     def train_on_batch(self, x, y):
         num_pop = 10
         lr = 0.01
-        mutations = np.random.uniform(-lr, lr,(num_pop, ) + self.W.shape) * np.random.binomial(1, 0.1, self.W.shape)  # num_pop, input_dim, num_classes
+        mutations = np.random.uniform(-lr, lr,(num_pop, ) + self.W.shape) * np.random.binomial(1, 0.01, self.W.shape)  # num_pop, input_dim, num_classes
         #mutations.append(self.previous_update)
         rewards = np.zeros(num_pop)
         current_reward = self.reward(self.predict(x), y).mean()
