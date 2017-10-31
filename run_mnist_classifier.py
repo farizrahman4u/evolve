@@ -25,7 +25,7 @@ y_test = to_categorical(y_test, 10)
 
 clf = Classifier(784, 10)   # 784 is the number of pixels in an image
 
-#clf.fit(x_train, y_train, batch_size=batch_size, epochs=epochs)
+clf.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_data=(x_test, y_test))
 
 accuracy = clf.evaluate(x_test, y_test) * 100
 

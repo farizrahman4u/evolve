@@ -49,9 +49,10 @@ class Classifier(object):
         update = np.tensordot(rewards, mutations, (0, 0))
         self.W += lr * update
 
-    def fit(self, x, y, batch_size=32, epochs=10):
+    def fit(self, x, y, batch_size=32, epochs=10, validation_data=None):
         num_samples = len(x)
         for epoch in range(epochs):
+            print('')
             print ('Epoch ' + str(epoch + 1) + ': ')
             idx = 0
             pbar = ProgressBar(num_samples)
@@ -61,6 +62,9 @@ class Classifier(object):
                 self.train_on_batch(x_batch, y_batch)
                 pbar.add(batch_size)
                 idx += batch_size
+            if validation_data:
+                print('')
+                print('Accuracy :' + str(self.evaluate(*validation_data)) + '%')
 
     def evaluate(self, x, y):
         y_pred = self.predict(x)
