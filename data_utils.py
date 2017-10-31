@@ -209,7 +209,7 @@ def get_file(fname,
                     total_size = None
                 ProgressTracker.progbar = Progbar(total_size)
             else:
-                ProgressTracker.progbar.set_value(count * block_size)
+                ProgressTracker.progbar.update(count * block_size)
 
         error_msg = 'URL fetch failure on {}: {} -- {}'
         try:

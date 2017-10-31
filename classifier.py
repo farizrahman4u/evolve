@@ -57,14 +57,13 @@ class Classifier(object):
             x_batch = x[idx : idx + batch_size]
             y_batch = y[idx : idx + batch_size]
             self.train_on_batch(x_batch, y_batch)
-            pbar.update(batch_size)
+            pbar.add(batch_size)
             idx += batch_size
 
     def evaluate(self, x, y):
         y_pred = self.predict(x)
         predcited_labels = np.argmax(y_pred, axis=1)
-        true_labels = np.argmax(y_pred, axis=1)
+        true_labels = np.argmax(y, axis=1)
         num_correct_labels = np.sum(true_labels == predcited_labels)
         accuracy = float(num_correct_labels) / len(x)
         return accuracy
-
