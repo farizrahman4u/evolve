@@ -26,7 +26,7 @@ class Classifier(object):
         return np.diag(y_pred.T[labels])
 
     def train_on_batch(self, x, y):
-        num_pop = 100
+        num_pop = 10
         lr = 0.01
         mutations = np.random.normal(-0.1, 0.1, (num_pop,) + self.W.shape)  # num_pop, input_dim, num_classes
         W = mutations + self.W  # num_pop, input_dim, num_classes
@@ -51,14 +51,16 @@ class Classifier(object):
 
     def fit(self, x, y, batch_size=32, epochs=10):
         num_samples = len(x)
-        idx = 0
-        pbar = ProgressBar(num_samples)
-        while idx < num_samples:
-            x_batch = x[idx : idx + batch_size]
-            y_batch = y[idx : idx + batch_size]
-            self.train_on_batch(x_batch, y_batch)
-            pbar.add(batch_size)
-            idx += batch_size
+        for epoch in range(epochs):
+            print ('Epoch ' + str(epoch + 1) + ': ')
+            idx = 0
+            pbar = ProgressBar(num_samples)
+            while idx < num_samples:
+                x_batch = x[idx : idx + batch_size]
+                y_batch = y[idx : idx + batch_size]
+                self.train_on_batch(x_batch, y_batch)
+                pbar.add(batch_size)
+                idx += batch_size
 
     def evaluate(self, x, y):
         y_pred = self.predict(x)
