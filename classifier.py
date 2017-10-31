@@ -3,18 +3,38 @@ from progressbar import ProgressBar
 
 class Classifier(object):
 
-    def __init__(self, input_dim, num_classes):
+    def __init__(self, input_dim, num_classes, hidden_dim=None):
         self.input_dim = input_dim
         self.num_classes = num_classes
+        self.hidden_dim = hidden_dim
         self.build()
 
     def build(self):
-        self.W = np.zeros((self.input_dim, self.num_classes))
+        if self.hidden_dim:
+            self.W = np.zeros((self.input_dim + self.num_classes, self.hidden_dim))
+        else:
+            self.W = np.zeros((self.input_dim, self.num_classes))
+            self.predict = self._predict
         #self.W = np.random.uniform(-.1, .1, (self.input_dim, self.num_classes))
         self.previous_update = np.zeros_like(self.W)
 
-    def predict(self, x):
-        h = np.dot(x, self.W)
+    def _predict(self, x, w=None):
+        if w is None:
+            w = self.W
+        h = np.dot(x, w)
+        y = np.exp(h - np.max(h, axis=1, keepdims=True))
+        s = np.sum(y, axis=1, keepdims=True)
+        y /= s
+        return y
+
+    def predict(self, x, w=None):
+        if w is None:
+            w = self.W
+        w1 = w[:self.input_dim, :]
+        w2 = w[self.input_dim:, :].T
+        h = np.dot(x, w1)
+        h = 1. / (1. + np.exp(-h))
+        y = np.dot(h, w2)
         y = np.exp(h - np.max(h, axis=1, keepdims=True))
         s = np.sum(y, axis=1, keepdims=True)
         y /= s
@@ -55,16 +75,13 @@ class Classifier(object):
     def train_on_batch(self, x, y):
         num_pop = 10
         lr = 0.01
-        mutations = np.random.uniform(-lr, lr,(num_pop, ) + self.W.shape)  # num_pop, input_dim, num_classes
+        mutations = np.random.uniform(-lr, lr,(num_pop, ) + self.W.shape) * np.random.binomial(1, 0.2, self.W.shape)  # num_pop, input_dim, num_classes
         #mutations.append(self.previous_update)
         rewards = np.zeros(num_pop)
         current_reward = self.reward(self.predict(x), y).mean()
         for i, m in enumerate(mutations):
-            W = m + self.W
-            h = np.dot(x, W)
-            y_hat = np.exp(h - np.max(h, axis=1, keepdims=True))
-            s = np.sum(y_hat, axis=1, keepdims=True)
-            y_hat /= s
+            w = m + self.W
+            y_hat = self.predict(x, w)
             rewards[i] = self.reward(y_hat, y).mean()
         rewards -= current_reward#np.mean(rewards)
         
@@ -73,7 +90,6 @@ class Classifier(object):
             rewards = np.zeros_like(rewards)
         else:
             rewards /= std
-        ###
         update = np.zeros_like(self.W)
         max_idx = np.argmax(rewards)
         max_reward = rewards[max_idx]
@@ -83,8 +99,7 @@ class Classifier(object):
         min_reward = rewards[min_idx]
         if min_reward < 0:
             update -= mutations[min_idx] * np.abs(min_reward)
-        ###
-        #rewards *= np.abs(rewards)
+        
         #update = np.tensordot(rewards, mutations, (0, 0))
         #update = update + 0.1 * self.previous_update
         #self.previous_update = update
