@@ -58,6 +58,7 @@ class Classifier(object):
         mutations = [np.random.normal(-lr, lr, self.W.shape) for _ in range(num_pop)]  # num_pop, input_dim, num_classes
         #mutations.append(self.previous_update)
         rewards = np.zeros(num_pop)
+        current_reward = self.reward(self.predict(x), y).mean()
         for i, m in enumerate(mutations):
             W = m + self.W
             h = np.dot(x, W)
@@ -65,12 +66,15 @@ class Classifier(object):
             s = np.sum(y_hat, axis=1, keepdims=True)
             y_hat /= s
             rewards[i] = self.reward(y_hat, y).mean()
-        rewards -= np.mean(rewards)
+        rewards -= current_reward#np.mean(rewards)
+        #rewards *= rewards > 0
+        
         std = np.std(rewards)
         if std == 0:
             rewards = np.zeros_like(rewards)
         else:
             rewards /= std
+        
         update = np.tensordot(rewards, mutations, (0, 0))
         #update = update + 0.1 * self.previous_update
         self.previous_update = update
