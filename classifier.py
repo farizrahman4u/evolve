@@ -73,7 +73,7 @@ class Classifier(object):
         self.W += lr * update
 
     def train_on_batch(self, x, y):
-        num_pop = 10
+        num_pop = 5
         lr = 0.01
         mutations = np.random.uniform(-lr, lr,(num_pop, ) + self.W.shape) * np.random.binomial(1, 0.01, self.W.shape)  # num_pop, input_dim, num_classes
         #mutations.append(self.previous_update)
