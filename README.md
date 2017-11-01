@@ -38,7 +38,7 @@ class MLPClassifier(Classifier):
     def build(self):
         # Method for initializing weights
         self.w1 = np.random.uniform(-1, 1, (self.input_dim, self.hidden_dim))  # layer 1 matrix
-        self.b1 = np.zeros(self.hidden_dim)  # layer1 bias
+        self.b1 = np.zeros(self.hidden_dim)  # layer 1 bias
         self.w2 = np.random.uniform(-1, 1, (self.hidden_dim,  self.num_classes))  # layer 2 matrix
         self.b2 = np.zeros(self.num_classes)  # layer 2 bias
         # weights wont be trained unless they are added to self.weights list
