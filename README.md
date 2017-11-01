@@ -27,6 +27,7 @@ from classifier import Classifier
 # import activations
 from activations import sigmoid, softmax
 
+import numpy as np
 
 class MLPClassifier(Classifier):
     def __init__(self, input_dim, num_classes, hidden_dim, **kwargs):
