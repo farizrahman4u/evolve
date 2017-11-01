@@ -1,4 +1,4 @@
-from classifier import Classifier
+from simple_classifier import SimpleClassifier as Classifier
 from mnist import load_data
 from np_utils import to_categorical
 import numpy as np
@@ -27,6 +27,6 @@ clf = Classifier(784, 10)   # 784 is the number of pixels in an image
 
 clf.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_data=(x_test, y_test))
 
-accuracy = clf.evaluate(x_test, y_test) * 100
+score = clf.evaluate(x_test, y_test)
 
-print('Accuracy = ' + str(accuracy) + '%')
+print(score)
