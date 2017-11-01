@@ -80,7 +80,7 @@ clf.fit(x_train, y_train, epochs=10, batch_size=16, validation_data=(x_test, y_t
 ```
 
 You can do inference using the functional interface:
-
+python
 ```
 x_random = np.random.random((32, 784))  # 32 random inputs
 y = clf(x)  # can also do y = clf.predict(x)
