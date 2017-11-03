@@ -1,4 +1,5 @@
 from simple_classifier import SimpleClassifier as Classifier
+from mlp_classifier import MLPClassifier as Classifier
 from mnist import load_data
 from np_utils import to_categorical
 import numpy as np

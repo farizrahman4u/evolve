@@ -36,10 +36,37 @@ class Model(object):
         # functional interface
         return self.predict(*args, **kwargs)
 
+
     def train_on_batch(self, x, y):
+        mutations = [[np.random.uniform(-self.lr, self.lr, w.shape) for w in self.weights] for _ in range(self.num_pop)]
+        dropout_mask = [np.random.binomial(1, self.dropout, w.shape) for w in self.weights]
+        for M in mutations:
+            for m, d in zip(M, dropout_mask):
+                m *= d
+        rewards = np.zeros(self.num_pop)
+        current_reward = self.reward(self.predict(x), y).mean()
+        for j, m in enumerate(mutations):
+            for w1, w2 in zip(m, self.weights):
+                w2 += w1
+            y_hat = self.predict(x)
+            for w1, w2 in zip(m, self.weights):
+                w2 -= w1
+            rewards[j] = self.reward(y_hat, y).mean()
+        rewards -= current_reward
+        std = np.std(rewards)
+        if std == 0:
+            rewards = np.zeros_like(rewards)
+        else:
+            rewards /= std
+        for r, m in zip(rewards, mutations):
+            for w1, w2 in zip(m, self.weights):
+                w2 += r * w1
+        #w += update
+
+    def _train_on_batch(self, x, y):
         w_idx = np.random.randint(0, len(self.weights))
         W = self.weights[w_idx]
-        for w in self.weights:
+        for w in [W]:
             mutations = np.random.uniform(-self.lr, self.lr,(self.num_pop, ) + w.shape)
             dropout_mask = np.random.binomial(1, self.dropout, w.shape)
             mutations *= dropout_mask
