@@ -15,6 +15,6 @@ class SimpleClassifier(Classifier):
         self.weights = [w]
 
     def predict(self, x):
-    	w = self.weights[0]
+        w = self.weights[0]
         h = np.dot(x, w)
-       	return softmax(h)
+        return softmax(h)
